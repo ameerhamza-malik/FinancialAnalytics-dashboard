@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+pyodbc
+python-multipart
+python-jose[cryptography]
+pandas
+openpyxl
+xlsxwriter
+sqlalchemy
+python-dotenv
+pydantic
+pydantic-settings
+cryptography
+PyJWT
+aiofiles
+jinja2

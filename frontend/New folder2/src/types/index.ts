@@ -1,0 +1,365 @@
+export enum UserRole {
+  ADMIN = "admin",
+  IT_USER = "IT_USER",
+  CEO = "CEO", 
+  FINANCE_USER = "FINANCE_USER",
+  TECH_USER = "TECH_USER",
+  USER = "user",
+}
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  role?: UserRole;
+  is_active: boolean;
+  must_change_password?: boolean;
+  created_at: string;
+  /**
+   * Optional list of feature codes that should be hidden for this user.
+   * Supported values (case-insensitive):
+   *  - "dashboard"
+   *  - "data_explorer"
+   *  - "excel_compare"
+   *  - "processes"
+   */
+  hidden_features?: string[];
+}
+
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface AuthToken {
+  access_token: string;
+  token_type: string;
+  user: User;
+}
+
+// Menu Types
+export interface MenuItem {
+  id: number;
+  name: string;
+  type: "dashboard" | "report";
+  icon?: string;
+  parent_id?: number;
+  sort_order: number;
+  is_active: boolean;
+  role?: UserRole | UserRole[];
+  children: MenuItem[];
+  // Interactive dashboard support (template stored on the menu item)
+  is_interactive_dashboard?: boolean;
+  interactive_template?: string | null;
+}
+
+// ---------------------------------------------
+// Dynamic Role Types (Backend /api/roles)
+// ---------------------------------------------
+
+export interface Role {
+  name: string;
+  is_system: boolean;
+}
+
+// Query Types
+export interface Query {
+  id: number;
+  name: string;
+  description?: string;
+  sql_query: string;
+  chart_type?: string;
+  chart_config?: Record<string, unknown>;
+  menu_item_id?: number; // Keep for backward compatibility
+  menu_item_ids?: number[]; // Multiple menu assignments
+  menu_names?: string[]; // Menu names for display
+  is_active: boolean;
+  created_at: string;
+  // Role constraint string from backend (comma-separated)
+  role?: string;
+  // Form-based report support
+  is_form_report?: boolean;
+  form_template?: string | null;
+}
+
+export interface QueryExecuteRequest {
+  query_id?: number;
+  sql_query?: string;
+  limit?: number;
+  offset?: number;
+}
+
+// Chart Types
+export interface ChartData {
+  labels: string[];
+  datasets: ChartDataset[];
+}
+
+export interface ChartDataset {
+  label?: string;
+  data: number[];
+  backgroundColor?: string | string[];
+  borderColor?: string | string[];
+  borderWidth?: number;
+  fill?: boolean;
+}
+
+export interface ChartConfig {
+  responsive?: boolean;
+  maintainAspectRatio?: boolean;
+  indexAxis?: "x" | "y";
+  scales?: Record<string, unknown>;
+  plugins?: Record<string, unknown>;
+}
+
+// Table Types
+export interface TableData {
+  columns: string[];
+  data: (string | number | null)[][];
+  total_count: number;
+}
+
+// API Response Types
+export interface QueryResult {
+  success: boolean;
+  data?: ChartData | TableData;
+  chart_type?: string;
+  chart_config?: Record<string, unknown>;
+  error?: string;
+  execution_time?: number;
+}
+
+export interface APIResponse<T = unknown> {
+  success: boolean;
+  message?: string;
+  data?: T;
+  error?: string;
+}
+
+export interface KPI {
+  id: number;
+  label: string;
+  value: number;
+}
+
+// Dashboard Types
+export interface DashboardWidget {
+  id: number;
+  title: string;
+  query_id: number;
+  position_x: number;
+  position_y: number;
+  width: number;
+  height: number;
+  is_active: boolean;
+  query?: Query;
+}
+
+export interface DashboardLayout {
+  widgets: DashboardWidget[];
+}
+
+// Filter Types
+export interface FilterCondition {
+  column: string;
+  operator: "eq" | "ne" | "gt" | "lt" | "gte" | "lte" | "like" | "in";
+  value: string | number | string[] | number[];
+}
+
+export interface TableFilter {
+  conditions: FilterCondition[];
+  logic: "AND" | "OR";
+}
+
+export interface FilteredQueryRequest {
+  query_id?: number;
+  sql_query?: string;
+  filters?: TableFilter;
+  limit?: number;
+  offset?: number;
+  sort_column?: string;
+  sort_direction?: "ASC" | "DESC";
+}
+
+// Export Types
+export interface ExportRequest {
+  query_id?: number;
+  sql_query?: string;
+  format: "excel" | "csv" | "pdf";
+  filename?: string;
+}
+
+// Component Props Types
+export interface ChartComponentProps {
+  data: ChartData;
+  type:
+    | "bar"
+    | "line"
+    | "pie"
+    | "doughnut"
+    | "scatter"
+    | "bubble"
+    | "polarArea"
+    | "radar";
+  config?: ChartConfig;
+  height?: number;
+  className?: string;
+}
+
+export interface TableComponentProps {
+  data: TableData;
+  loading?: boolean;
+  onSort?: (column: string, direction: "ASC" | "DESC") => void;
+  onFilter?: (filters: TableFilter) => void;
+  onExport?: (format: "excel" | "csv") => void;
+  className?: string;
+}
+
+export interface SidebarProps {
+  menuItems: MenuItem[];
+  currentPath: string;
+  onMenuClick: (item: MenuItem) => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+}
+
+// Form Types
+export interface LoginFormData {
+  username: string;
+  password: string;
+}
+
+export interface QueryFormData {
+  name: string;
+  description?: string;
+  sql_query: string;
+  chart_type?: string;
+  chart_config?: Record<string, unknown>;
+  menu_item_id?: number; // Keep for backward compatibility
+  menu_item_ids?: number[]; // Multiple menu assignments
+  is_form_report?: boolean;
+  form_template?: string;
+}
+
+// Grid Layout Types (for dashboard)
+export interface GridLayout {
+  i: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  minW?: number;
+  maxW?: number;
+  minH?: number;
+  maxH?: number;
+  static?: boolean;
+}
+
+// Pagination Types
+export interface PaginationInfo {
+  page: number;
+  page_size: number;
+  total_count: number;
+  total_pages: number;
+}
+
+export interface PaginatedResponse<T> {
+  success: boolean;
+  data: T[];
+  total_count: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+// Error Types
+export interface ErrorInfo {
+  message: string;
+  code?: string;
+  details?: Record<string, unknown>;
+}
+
+// Theme Types
+export interface ThemeConfig {
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  surface: string;
+  text: string;
+  error: string;
+  warning: string;
+  success: string;
+  info: string;
+}
+
+// Report Types
+export interface ReportMetadata {
+  id: number;
+  name: string;
+  description?: string;
+  chart_type?: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface ReportSection {
+  id: number;
+  name: string;
+  reports: ReportMetadata[];
+}
+
+// Widget configuration for dashboard
+export interface WidgetConfig {
+  id: string;
+  title: string;
+  type: "chart" | "table" | "metric" | "text";
+  query_id?: number;
+  custom_query?: string;
+  chart_type?: string;
+  refresh_interval?: number; // in seconds
+  config?: Record<string, unknown>;
+}
+
+// ---------------------------
+// Process types (Scenario 3)
+// ---------------------------
+
+export type ParameterInputType = "text" | "dropdown" | "date";
+
+export interface ProcessParameter {
+  name: string;
+  label: string;
+  input_type: ParameterInputType;
+  default_value?: string;
+  dropdown_values?: string[];
+}
+
+export interface Process {
+  id: number;
+  name: string;
+  description?: string;
+  script_path: string;
+  parameters?: ProcessParameter[];
+  is_active: boolean;
+  role?: string | string[];
+  created_at: string;
+}
+
+export interface ProcessCreate {
+  name: string;
+  description?: string;
+  script_path: string;
+  parameters?: ProcessParameter[];
+  role?: string | string[];
+}
+
+// ---------------------------
+// Script file types
+// ---------------------------
+
+export interface ScriptFile {
+  path: string;
+  display: string;
+  description?: string;
+}

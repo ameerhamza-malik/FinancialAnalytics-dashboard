@@ -1,0 +1,21 @@
+services:
+  oracle-db:
+    image: gvenzl/oracle-xe:21-slim
+    # Default to x86_64 image (works on Windows/Linux/macOS-Intel).  
+    # Override at runtime for Apple Silicon with:  
+    #   ORACLE_PLATFORM=linux/arm64 docker compose up -d
+    platform: ${ORACLE_PLATFORM:-linux/amd64}
+    container_name: oracle-analytics-db
+    environment:
+      ORACLE_PASSWORD: admin123
+      ORACLE_DATABASE: ANALYTICS
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+      - ./SAMPLE_DATA.sql:/docker-entrypoint-initdb.d/01-sample-data.sql:ro
+    restart: unless-stopped
+
+volumes:
+  oracle-data:
+
