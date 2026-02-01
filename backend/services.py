@@ -625,7 +625,8 @@ class QueryService:
 
             junction_sql = """
             SELECT q.id, q.name, q.description, q.sql_query, q.chart_type,
-                   q.chart_config, q.menu_item_id, q.role, q.is_active, q.created_at
+                   q.chart_config, q.menu_item_id, q.role, q.is_kpi, q.is_default_dashboard,
+                   q.is_form_report, q.form_template, q.is_active, q.created_at
             FROM app_queries q
             JOIN app_query_menu_items j ON j.query_id = q.id
             WHERE q.is_active = 1 AND j.menu_item_id = :menu_id
